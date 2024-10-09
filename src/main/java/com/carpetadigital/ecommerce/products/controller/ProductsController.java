@@ -1,13 +1,13 @@
 package com.carpetadigital.ecommerce.products.controller;
 
 import com.carpetadigital.ecommerce.Entity.DocumentsEntity;
+import com.carpetadigital.ecommerce.Entity.dto.DocumentDto;
 import com.carpetadigital.ecommerce.Repository.DocumentsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -19,9 +19,14 @@ public class ProductsController {
     @Autowired
     public DocumentsRepository documentsRepository;
 
-    @PostMapping(value = "/demo")
-    public String welcome(){
-        return "welcome from secure endpoint";
+    @PostMapping("/postDocument")
+    public void postDocument(@ModelAttribute @Validated DocumentDto documentDto){
+        MultipartFile file = documentDto.getFile();
+
+        if(!file.isEmpty()) {
+            String fileName = file.getOriginalFilename();
+            System.out.println( "archivo recibido: " + fileName);
+        }
     }
 
     @GetMapping("/documents")

@@ -6,8 +6,12 @@ import com.carpetadigital.ecommerce.utils.exception.factory.ErrorResponseFactory
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j(topic = "GlobalExceptionHandler")
 @RestControllerAdvice
@@ -33,4 +37,15 @@ public class GlobalExceptionHandler {
         errorResponse.setMessage("Internal Server Error, " + ex.getMessage());
         return errorFactory.buildResponseEntity(errorResponse);
     }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Map<String, String> handleInvalidArguements(MethodArgumentNotValidException exception) {
+        Map<String, String> errors = new HashMap<>();
+
+        exception.getBindingResult().getFieldErrors().forEach(error -> {
+            errors.put(error.getField(), error.getDefaultMessage());
+        });
+        return errors;
+    }
+
 }
