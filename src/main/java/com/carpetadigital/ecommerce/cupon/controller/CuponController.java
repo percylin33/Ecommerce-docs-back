@@ -17,13 +17,14 @@ public class CuponController {
     @Autowired
     private CuponService cuponService;
     @PostMapping("/create")
-    public ResponseEntity<Cupon> createCupon(@RequestBody CuponDTO cuponDTO) {
-        Cupon newCupon = cuponService.createCupon(cuponDTO);
-        return ResponseEntity.ok(newCupon);
+    public ResponseEntity<Object> createCupon(@RequestBody CuponDTO cuponDTO) {
+        return  ResponseHandler.generateResponse(HttpStatus.OK,
+                cuponService.createCupon(cuponDTO),
+                true);
     }
 
     @GetMapping("/validate/{code}")
-    public ResponseEntity<?> validateCupon(@PathVariable String code) throws Exception {
+    public ResponseEntity<Object> validateCupon(@PathVariable String code) throws Exception {
         return ResponseHandler.generateResponse(
                 HttpStatus.OK,
                 cuponService.validateCupon(code),
