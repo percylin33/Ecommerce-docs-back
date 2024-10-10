@@ -4,13 +4,11 @@ import com.carpetadigital.ecommerce.entity.Cupon;
 import com.carpetadigital.ecommerce.entity.dto.CuponDTO;
 import com.carpetadigital.ecommerce.repository.CuponRepository;
 import com.carpetadigital.ecommerce.utils.exception.common.ResourceNotFoundException;
-import jdk.jshell.spi.ExecutionControl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
