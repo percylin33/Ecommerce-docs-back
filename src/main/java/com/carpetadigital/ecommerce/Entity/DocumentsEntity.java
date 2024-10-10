@@ -10,9 +10,9 @@ import java.time.LocalDate;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "documents")
 @Data
 @Entity
+@Table(name = "documents")
 public class DocumentsEntity {
 
     @Id
@@ -28,8 +28,8 @@ public class DocumentsEntity {
     @Column(nullable = false, length = 10)
     private String format;
 
-    @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal price;
+    @Column(nullable = false)
+    private Float price;
 
     @Column(name = "file_url", nullable = false, length = 254)
     private String fileUrl;
@@ -37,6 +37,9 @@ public class DocumentsEntity {
     @Column(length = 50)
     private String category;
 
+    @Column(name = "borrado_logico")
+    private Boolean borradoLogico = false;
+
     @Column(name = "created_at")
-    private LocalDate createdAt;
+    private LocalDate createdAt = LocalDate.now();
 }
