@@ -1,5 +1,6 @@
 package com.carpetadigital.ecommerce.User;
 
+import com.carpetadigital.ecommerce.entity.Rol;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,7 +11,10 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
@@ -25,16 +29,19 @@ public class User implements UserDetails {
     @Column(nullable = false)
     String username;
     String password;
+    String email;
     String firstname;
     String lastname;
     String country;
-    @Enumerated(EnumType.STRING)
-    Role role;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "rol_id")
+    private Rol rol;
 
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority((role.name())));
+        return null;
     }
 
     @Override

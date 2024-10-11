@@ -15,4 +15,5 @@ public class RegisterRequest {
     String firstname;
     String lastname;
     String country;
+    String rol;
 }
