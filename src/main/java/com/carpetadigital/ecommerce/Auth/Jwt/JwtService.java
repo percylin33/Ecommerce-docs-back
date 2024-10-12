@@ -9,13 +9,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 @Service
 public class JwtService {
+    private final Set<String> invalidTokens = new HashSet<>();
     private static final String SECRET_KEY="53F8FS5613SDF2G3S1846121SD543EG14H5121421242SDD941J82";
     public String getToken(UserDetails user) {
         return getToken(new HashMap<>(), user);
@@ -67,4 +66,9 @@ public class JwtService {
     private boolean isTokenExpired(String token){
         return getExpiration(token).before(new Date());
     }
+
+    public void invalidateToken(String token) {
+        invalidTokens.add(token);
+    }
+
 }
