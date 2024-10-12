@@ -1,6 +1,5 @@
-package com.carpetadigital.ecommerce.Jwt;
+package com.carpetadigital.ecommerce.Auth.Jwt;
 
-import com.carpetadigital.ecommerce.User.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

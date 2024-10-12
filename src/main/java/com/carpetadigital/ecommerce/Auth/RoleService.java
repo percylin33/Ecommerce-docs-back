@@ -1,6 +1,5 @@
 package com.carpetadigital.ecommerce.Auth;
 
-import com.carpetadigital.ecommerce.User.User;
 import com.carpetadigital.ecommerce.entity.Rol;
 import com.carpetadigital.ecommerce.repository.RolRepository;
 import org.springframework.beans.factory.annotation.Autowired;

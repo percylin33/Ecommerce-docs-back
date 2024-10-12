@@ -1,9 +1,8 @@
 package com.carpetadigital.ecommerce.Auth;
 
-import com.carpetadigital.ecommerce.Jwt.JwtService;
-import com.carpetadigital.ecommerce.User.Role;
-import com.carpetadigital.ecommerce.User.User;
-import com.carpetadigital.ecommerce.User.UserRepository;
+import com.carpetadigital.ecommerce.Auth.Jwt.JwtService;
+import com.carpetadigital.ecommerce.Auth.User.User;
+import com.carpetadigital.ecommerce.Auth.User.UserRepository;
 import com.carpetadigital.ecommerce.entity.Rol;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

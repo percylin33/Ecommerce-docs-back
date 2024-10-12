@@ -1,4 +1,4 @@
-package com.carpetadigital.ecommerce.User;
+package com.carpetadigital.ecommerce.Auth.User;
 
 public class Role {
     private static final  String ADMIN = "ADMIN";

@@ -1,7 +1,6 @@
 package com.carpetadigital.ecommerce.entity;
 
-import com.carpetadigital.ecommerce.User.User;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.carpetadigital.ecommerce.Auth.User.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
