@@ -35,6 +35,10 @@ public class Payment {
     @JoinColumn(name = "document_id")
     private DocumentsEntity idDocument;
 
+    @ManyToOne
+    @JoinColumn(name = "order_id")
+    private Order order;
+
     public boolean isSubscription() {
         return isSubscription;
     }

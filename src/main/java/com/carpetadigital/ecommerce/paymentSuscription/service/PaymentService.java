@@ -1,8 +1,11 @@
 package com.carpetadigital.ecommerce.paymentSuscription.service;
 
+import com.carpetadigital.ecommerce.entity.DocumentsEntity;
+import com.carpetadigital.ecommerce.entity.Order;
 import com.carpetadigital.ecommerce.entity.Payment;
 import com.carpetadigital.ecommerce.entity.Subscription;
 import com.carpetadigital.ecommerce.entity.dto.PaymentSuscriptionDto;
+import com.carpetadigital.ecommerce.repository.OrderRepository;
 import com.carpetadigital.ecommerce.repository.PaymentRepository;
 import com.carpetadigital.ecommerce.repository.SubscriptionRepository;
 import lombok.Data;
@@ -13,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @Slf4j
@@ -28,13 +32,18 @@ public class PaymentService {
     @Autowired
     private SubscriptionRepository subscriptionRepository;
 
+    @Autowired
+    private OrderRepository orderRepository;
+
+   // @Autowired
+   // private DocumentsRepository documentsRepository;
+
     public Boolean processPayment(PaymentSuscriptionDto paymentSuscriptionDto) throws Exception {
         log.info("Procesando pago: " + paymentSuscriptionDto);
 
         if(paymentSuscriptionDto.getStatus() == null){
-             throw new Exception("El estado del pago no puede ser nulo");
+            throw new Exception("El estado del pago no puede ser nulo");
         }
-
 
         Payment payment = new Payment();
         payment.setPaymentDate(new java.sql.Timestamp(System.currentTimeMillis()));
@@ -43,21 +52,15 @@ public class PaymentService {
         payment.setPaymentStatus(paymentSuscriptionDto.getStatus());
         payment.setIsSubscription(paymentSuscriptionDto.isSubscription());
 
-
-
-        // Diferenciar entre suscripción y pago por producto
         if (payment.isSubscription()) {
-            // Pago de suscripción
+            // Lógica de pago de suscripción
             Subscription subscription = new Subscription();
-            // Configuramos los detalles de la suscripción
             subscription.setUserId(paymentSuscriptionDto.getUserId());
             subscription.setStatus(paymentSuscriptionDto.getStatus());
             subscription.setSubscriptionType(paymentSuscriptionDto.getSubscriptionType());
 
-            // Establecemos la fecha de inicio de la suscripción (java.sql.Date con la fecha actual)
             Date sqlStartDate = new Date(System.currentTimeMillis());
             subscription.setStartDate(sqlStartDate);
-
 
             LocalDate startLocalDate = sqlStartDate.toLocalDate();
             LocalDate endLocalDate = startLocalDate.plusMonths(12);
@@ -67,21 +70,25 @@ public class PaymentService {
             Subscription su = subscriptionRepository.save(subscription);
             payment.setSubscription(su);
 
-
-            System.out.println("Fecha de finalización: " + sqlEndDate);
             log.info("Suscripción exitosa: " + subscription);
-
-
-            log.info("Pago procesado: " + payment);
         } else {
+            // Lógica de orden de compra
+            Order order = new Order();
+            order.setUserId(paymentSuscriptionDto.getUserId());
+            order.setTotalAmount(paymentSuscriptionDto.getAmount());
+            order.setOrderDate(new java.sql.Timestamp(System.currentTimeMillis()));
+            order.setOrderStatus(paymentSuscriptionDto.getStatus());
 
-            // Lógica para el pago por producto
-            log.info("compra de producto " + payment);
+            // Obtener documentos por sus IDs
+          //  List<DocumentsEntity> documents = documentsRepository.findAllById(paymentSuscriptionDto.getDocumentIds());
+         //   order.setDocuments(documents);
+
+            Order savedOrder = orderRepository.save(order);
+            payment.setOrder(savedOrder);
+            log.info("Orden de compra exitosa: " + savedOrder);
         }
 
-        // Guardar el pago en la base de datos
         paymentRepository.save(payment);
         return true;
     }
-
 }
