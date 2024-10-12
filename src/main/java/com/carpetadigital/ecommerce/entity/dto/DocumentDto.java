@@ -1,4 +1,4 @@
-package com.carpetadigital.ecommerce.Entity.dto;
+package com.carpetadigital.ecommerce.entity.dto;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
@@ -8,8 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.math.BigDecimal;
 
 @Data
 @NoArgsConstructor
@@ -40,6 +38,7 @@ public class DocumentDto {
     @Size(min=3, max = 50, message = "El campo debe tener entre 3 y 50 caracteres")
     private String category;
 
-    @NotNull
+
+    @NotNull(message = "Error al encontrar el archivo a guardar")
     private MultipartFile file;
 }

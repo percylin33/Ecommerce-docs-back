@@ -39,13 +39,22 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Map<String, String> handleInvalidArguements(MethodArgumentNotValidException exception) {
+    public ResponseEntity<Object> handleInvalidArguements(MethodArgumentNotValidException exception) {
         Map<String, String> errors = new HashMap<>();
-
+        // procesar los errores de validación por validated
         exception.getBindingResult().getFieldErrors().forEach(error -> {
             errors.put(error.getField(), error.getDefaultMessage());
         });
-        return errors;
-    }
-
+        //loguear los errores
+        log.error("data validation error: {}", errors);
+        // crear el mensaje de error
+        StringBuilder errorMessage = new StringBuilder("BAD_REQUEST_ERROR, ");
+        exception.getBindingResult().getFieldErrors().forEach(error -> {
+            errorMessage.append(error.getField()).append(": ").append(error.getDefaultMessage()).append("; ");
+        });
+        // crear la respuesta de error
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST);
+        errorResponse.setMessage(errorMessage.toString());
+        return errorFactory.buildResponseEntity(errorResponse);
+                }
 }

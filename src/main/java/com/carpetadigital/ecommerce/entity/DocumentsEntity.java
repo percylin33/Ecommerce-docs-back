@@ -1,11 +1,10 @@
-package com.carpetadigital.ecommerce.Entity;
+package com.carpetadigital.ecommerce.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @AllArgsConstructor
@@ -33,6 +32,9 @@ public class DocumentsEntity {
 
     @Column(name = "file_url", nullable = false, length = 254)
     private String fileUrl;
+
+    @Column(name = "file_id", nullable = false, length = 100)
+    private String fileId;
 
     @Column(length = 50)
     private String category;
