@@ -17,6 +17,12 @@ public class AuthController {
     }
 
 
+    @PostMapping(value = "logout")
+    public ResponseEntity<Void> logout(@RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
+        authService.logout(token);
+        return ResponseEntity.ok().build();
+    }
+
 
     @PostMapping(value = "register")
     public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request){

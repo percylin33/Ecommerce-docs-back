@@ -47,8 +47,10 @@ public class AuthService {
                 .firstname(request.getFirstname())
                 .lastname(request.getLastname())
                 .country(request.getCountry())
+                .email(request.getEmail())
                 .rol(userRole) // Asignar el rol al usuario
                 .build();
+        log.info("user "+user);
 
         // Guardar el usuario
         User savedUser = userRepository.save(user);
@@ -61,5 +63,10 @@ public class AuthService {
         return AuthResponse.builder()
                 .token(jwtService.getToken(savedUser))
                 .build();
+    }
+
+    public void logout(String token) {
+        // Aquí puedes invalidar el token JWT, por ejemplo, añadiéndolo a una lista de tokens inválidos
+        jwtService.invalidateToken(token);
     }
 }
