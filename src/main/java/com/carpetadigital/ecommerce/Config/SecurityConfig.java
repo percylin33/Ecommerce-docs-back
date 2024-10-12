@@ -25,8 +25,17 @@ public class SecurityConfig {
                         csrf.disable())
                 .authorizeHttpRequests(authRequest ->
                         authRequest
-                                .requestMatchers("/auth/**", "/api/v1/**", "/api/document/**").permitAll()
+                                .requestMatchers("/auth/**","/api/v1/**").permitAll()
+                                .requestMatchers("/admin/**").hasRole("ADMIN")
+                                .requestMatchers("/user/**").hasRole("USER")
                                 .anyRequest().authenticated()
+
+                        /*
+                        * .requestMatchers("/auth/**", "/api/v1/products/**", "/api/v1/categories/**", "/api/v1/public/**").permitAll()
+                        .requestMatchers("/api/v1/cart/**", "/api/v1/orders/**", "/api/v1/user/**").hasRole("USER")
+                        .requestMatchers("/api/v1/admin/products/**", "/api/v1/admin/categories/**", "/api/v1/admin/orders/**", "/api/v1/admin/users/**").hasRole("ADMIN")
+
+                        * */
 
         )
                 .sessionManagement(sessionManager ->
