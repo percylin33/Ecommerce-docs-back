@@ -1,6 +1,5 @@
 package com.carpetadigital.ecommerce.paymentSuscription.service;
 
-import com.carpetadigital.ecommerce.User.User;
 import com.carpetadigital.ecommerce.entity.Payment;
 import com.carpetadigital.ecommerce.entity.Subscription;
 import com.carpetadigital.ecommerce.entity.dto.PaymentSuscriptionDto;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.time.LocalDate;
-import java.time.ZoneId;
 
 @Data
 @Slf4j
@@ -30,7 +28,12 @@ public class PaymentService {
     @Autowired
     private SubscriptionRepository subscriptionRepository;
 
-    public void processPayment(PaymentSuscriptionDto paymentSuscriptionDto) {
+    public Boolean processPayment(PaymentSuscriptionDto paymentSuscriptionDto) throws Exception {
+        log.info("Procesando pago: " + paymentSuscriptionDto);
+
+        if(paymentSuscriptionDto.getStatus() == null){
+             throw new Exception("El estado del pago no puede ser nulo");
+        }
 
 
         Payment payment = new Payment();
@@ -38,16 +41,14 @@ public class PaymentService {
         payment.setUserId(paymentSuscriptionDto.getUserId());
         payment.setAmount(paymentSuscriptionDto.getAmount());
         payment.setPaymentStatus(paymentSuscriptionDto.getStatus());
-        payment.setSubscription(true);
+        payment.setIsSubscription(paymentSuscriptionDto.isSubscription());
 
-        log.info("Fecha de pago: " + payment.getPaymentDate());
 
 
         // Diferenciar entre suscripción y pago por producto
         if (payment.isSubscription()) {
             // Pago de suscripción
             Subscription subscription = new Subscription();
-
             // Configuramos los detalles de la suscripción
             subscription.setUserId(paymentSuscriptionDto.getUserId());
             subscription.setStatus(paymentSuscriptionDto.getStatus());
@@ -64,23 +65,23 @@ public class PaymentService {
 
             subscription.setEndDate(sqlEndDate);
             Subscription su = subscriptionRepository.save(subscription);
-
+            payment.setSubscription(su);
 
 
             System.out.println("Fecha de finalización: " + sqlEndDate);
             log.info("Suscripción exitosa: " + subscription);
 
-            // Guardar la suscripción en la base de datos
-            // paymentSuscriptionDto.save(subscription);
-            log.info("Pago procesado: " + payment);
 
+            log.info("Pago procesado: " + payment);
         } else {
+
             // Lógica para el pago por producto
             log.info("compra de producto " + payment);
         }
 
         // Guardar el pago en la base de datos
         paymentRepository.save(payment);
+        return true;
     }
 
 }

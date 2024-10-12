@@ -14,7 +14,7 @@ import java.util.List;
 public class Subscription {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long subscriptionId;
 
     @Column(nullable = false)
