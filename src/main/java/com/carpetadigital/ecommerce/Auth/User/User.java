@@ -1,4 +1,4 @@
-package com.carpetadigital.ecommerce.User;
+package com.carpetadigital.ecommerce.Auth.User;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
