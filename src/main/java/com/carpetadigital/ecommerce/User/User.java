@@ -1,5 +1,7 @@
 package com.carpetadigital.ecommerce.User;
 
+import com.carpetadigital.ecommerce.entity.Payment;
+import com.carpetadigital.ecommerce.entity.Subscription;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,7 +22,7 @@ import java.util.List;
 @Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = {"username"})})
 public class User implements UserDetails {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
     @Column(nullable = false)
     String username;
@@ -30,6 +32,23 @@ public class User implements UserDetails {
     String country;
     @Enumerated(EnumType.STRING)
     Role role;
+
+    @OneToMany(mappedBy = "userId")
+    private List<Payment> payments;
+
+    @OneToMany(mappedBy = "userId")
+    private List<Subscription> subscriptions;
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", firstname='" + firstname + '\'' +
+                ", lastname='" + lastname + '\'' +
+                ", country='" + country + '\'' +
+                ", role=" + role +
+                '}';
+    }
 
 
     @Override
