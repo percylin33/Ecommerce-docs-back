@@ -1,4 +1,4 @@
-package com.carpetadigital.ecommerce.User;
+package com.carpetadigital.ecommerce.Auth.User;
 
 import com.carpetadigital.ecommerce.entity.Payment;
 import com.carpetadigital.ecommerce.entity.Subscription;

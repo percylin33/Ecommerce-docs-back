@@ -1,4 +1,4 @@
-package com.carpetadigital.ecommerce.Jwt;
+package com.carpetadigital.ecommerce.Auth.Jwt;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

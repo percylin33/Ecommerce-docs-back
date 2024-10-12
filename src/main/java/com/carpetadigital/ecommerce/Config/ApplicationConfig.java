@@ -1,6 +1,6 @@
 package com.carpetadigital.ecommerce.Config;
 
-import com.carpetadigital.ecommerce.User.UserRepository;
+import com.carpetadigital.ecommerce.Auth.User.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

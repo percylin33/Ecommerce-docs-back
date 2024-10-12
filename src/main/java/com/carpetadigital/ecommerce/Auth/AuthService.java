@@ -1,9 +1,9 @@
 package com.carpetadigital.ecommerce.Auth;
 
-import com.carpetadigital.ecommerce.Jwt.JwtService;
-import com.carpetadigital.ecommerce.User.Role;
-import com.carpetadigital.ecommerce.User.User;
-import com.carpetadigital.ecommerce.User.UserRepository;
+import com.carpetadigital.ecommerce.Auth.Jwt.JwtService;
+import com.carpetadigital.ecommerce.Auth.User.Role;
+import com.carpetadigital.ecommerce.Auth.User.User;
+import com.carpetadigital.ecommerce.Auth.User.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
