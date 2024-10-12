@@ -33,6 +33,9 @@ public class DocumentsEntity {
     @Column(name = "file_url", nullable = false, length = 254)
     private String fileUrl;
 
+    @Column(name = "file_id", nullable = false, length = 100)
+    private String fileId;
+
     @Column(length = 50)
     private String category;
 
