@@ -1,11 +1,8 @@
 package com.carpetadigital.ecommerce.paymentSuscription.service;
 
-import com.carpetadigital.ecommerce.entity.DocumentsEntity;
-import com.carpetadigital.ecommerce.entity.Order;
 import com.carpetadigital.ecommerce.entity.Payment;
 import com.carpetadigital.ecommerce.entity.Subscription;
 import com.carpetadigital.ecommerce.entity.dto.PaymentSuscriptionDto;
-import com.carpetadigital.ecommerce.repository.OrderRepository;
 import com.carpetadigital.ecommerce.repository.PaymentRepository;
 import com.carpetadigital.ecommerce.repository.SubscriptionRepository;
 import lombok.Data;
@@ -13,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+
+import com.carpetadigital.ecommerce.entity.DocumentsEntity;
 
 import java.sql.Date;
 import java.time.LocalDate;
@@ -32,17 +31,16 @@ public class PaymentService {
     @Autowired
     private SubscriptionRepository subscriptionRepository;
 
-    @Autowired
-    private OrderRepository orderRepository;
 
-   // @Autowired
-   // private DocumentsRepository documentsRepository;
+
+    @Autowired
+    private final com.carpetadigital.ecommerce.Repository.DocumentsRepository documentsRepository;
 
     public Boolean processPayment(PaymentSuscriptionDto paymentSuscriptionDto) throws Exception {
         log.info("Procesando pago: " + paymentSuscriptionDto);
 
         if(paymentSuscriptionDto.getStatus() == null){
-            throw new Exception("El estado del pago no puede ser nulo");
+            throw new Exception("El pago no se realizo correcrtamente");
         }
 
         Payment payment = new Payment();
@@ -73,19 +71,20 @@ public class PaymentService {
             log.info("Suscripción exitosa: " + subscription);
         } else {
             // Lógica de orden de compra
-            Order order = new Order();
-            order.setUserId(paymentSuscriptionDto.getUserId());
-            order.setTotalAmount(paymentSuscriptionDto.getAmount());
-            order.setOrderDate(new java.sql.Timestamp(System.currentTimeMillis()));
-            order.setOrderStatus(paymentSuscriptionDto.getStatus());
+            List<DocumentsEntity> documents = documentsRepository.findAllById(paymentSuscriptionDto.getDocumentIds());
+            payment.setDocuments(documents);
 
-            // Obtener documentos por sus IDs
-          //  List<DocumentsEntity> documents = documentsRepository.findAllById(paymentSuscriptionDto.getDocumentIds());
-         //   order.setDocuments(documents);
 
-            Order savedOrder = orderRepository.save(order);
-            payment.setOrder(savedOrder);
-            log.info("Orden de compra exitosa: " + savedOrder);
+            if (paymentSuscriptionDto.getUserId() != null) {
+
+                log.info("compra de producto " + payment);
+            } else {
+                payment.setUserId(null);  // Si el campo permite nulos, deja el ID del usuario como nulo
+
+                log.info("Pago por producto para invitado: " + payment);
+            }
+
+
         }
 
         paymentRepository.save(payment);

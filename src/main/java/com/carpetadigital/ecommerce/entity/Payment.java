@@ -3,6 +3,10 @@ package com.carpetadigital.ecommerce.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.List;
+
+import com.carpetadigital.ecommerce.entity.DocumentsEntity;
+
 @Data
 @Entity
 @Table(name = "payments")
@@ -31,13 +35,13 @@ public class Payment {
     @Column(name = "is_subscription", nullable = false)
     private boolean isSubscription;
 
-    @ManyToOne
-    @JoinColumn(name = "document_id")
-    private DocumentsEntity idDocument;
-
-    @ManyToOne
-    @JoinColumn(name = "order_id")
-    private Order order;
+    @ManyToMany
+    @JoinTable(
+            name = "payment_documents",
+            joinColumns = @JoinColumn(name = "payment_id"),
+            inverseJoinColumns = @JoinColumn(name = "document_id")
+    )
+    private List<DocumentsEntity> documents;
 
     public boolean isSubscription() {
         return isSubscription;

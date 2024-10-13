@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -44,4 +45,7 @@ public class DocumentsEntity {
 
     @Column(name = "created_at")
     private LocalDate createdAt = LocalDate.now();
+
+    @ManyToMany(mappedBy = "documents")
+    private List<Payment> payments;
 }
