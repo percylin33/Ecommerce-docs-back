@@ -1,5 +1,6 @@
 package com.carpetadigital.ecommerce.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -41,6 +42,7 @@ public class Payment {
             joinColumns = @JoinColumn(name = "payment_id"),
             inverseJoinColumns = @JoinColumn(name = "document_id")
     )
+    @JsonManagedReference
     private List<DocumentsEntity> documents;
 
     public boolean isSubscription() {
