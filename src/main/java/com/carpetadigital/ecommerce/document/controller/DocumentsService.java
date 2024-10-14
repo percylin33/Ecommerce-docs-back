@@ -3,6 +3,7 @@ package com.carpetadigital.ecommerce.document.controller;
 import com.carpetadigital.ecommerce.entity.DocumentsEntity;
 import com.carpetadigital.ecommerce.entity.dto.DocumentDto;
 import com.carpetadigital.ecommerce.Repository.DocumentsRepository;
+import com.carpetadigital.ecommerce.utils.handler.ResponseHandler;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -10,13 +11,18 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
 @Slf4j
 @Service
 @RestController
@@ -76,7 +82,7 @@ public class DocumentsService {
                 datosIngreso.setFileUrl(fileUrl);
                 datosIngreso.setFileId(fileId);
 
-                DocumentsEntity documentsEntity= documentsRepository.save(datosIngreso);
+                DocumentsEntity documentsEntity = documentsRepository.save(datosIngreso);
                 log.info(" datosIngreso" + datosIngreso);
                 log.info("Documento guardado correctamente" + documentsEntity);
                 return documentsEntity;
@@ -130,5 +136,46 @@ public class DocumentsService {
         } else {
             throw new IllegalArgumentException("error de consistencia de datos");
         }
+    }
+
+    public DocumentsEntity actualizacionDocument(Long id, DocumentDto documentDto) {
+        Optional<DocumentsEntity> datos = documentsRepository.findById(id);
+
+        if (datos.isPresent()) {
+            DocumentsEntity document = datos.get();
+            MultipartFile fileUpdate = documentDto.getFile();
+
+            // verifico y actualizo solo los campos que se reciban por body
+            if (documentDto.getTitle() != null && !documentDto.getTitle().equals(document.getTitle())) {
+                document.setTitle(documentDto.getTitle());
+            } else if (documentDto.getPrice() != null && !documentDto.getPrice().equals(document.getPrice())) {
+                document.setPrice(documentDto.getPrice());
+            } else if (documentDto.getFormat() != null && !documentDto.getFormat().equals(document.getFormat())) {
+                document.setFormat(documentDto.getFormat());
+            } else if (documentDto.getDescription() != null && !documentDto.getDescription().equals(document.getDescription())) {
+                document.setDescription(documentDto.getDescription());
+            } else if (documentDto.getCategory() != null && !documentDto.getCategory().equals(document.getCategory())) {
+                document.setCategory(documentDto.getCategory());
+            } else if (fileUpdate != null) {
+                // busco el archivo en GoogleDrive y lo comparo
+                // código
+
+                // si el archivo es diferente borro el archivo existente y guardo el nuevo
+                // genero el fileUrl y fileId y lo guardo
+                String fileUrlUpdate = "http://Mofificado";
+                String fileIdUpdate = "modificado123456";
+
+                document.setFileUrl(fileUrlUpdate);
+                document.setFileId(fileIdUpdate);
+            } else {
+                throw new IllegalArgumentException("los elementos están actualizados");
+            }
+
+            // Guardo los cambios si hay modificaciones
+
+            DocumentsEntity updatedDocument = documentsRepository.save(document);
+            return updatedDocument;
+        }
+        throw new IllegalArgumentException("error al encontrar el elemento a actualizar");
     }
 }

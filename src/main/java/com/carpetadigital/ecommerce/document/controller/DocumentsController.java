@@ -68,4 +68,15 @@ public class DocumentsController {
                 true
         );
     }
+
+    // actualización de un documento
+    @PutMapping("/{id}")
+    public ResponseEntity<Object> actualizacionDocument(@PathVariable Long id, @ModelAttribute DocumentDto documentDto) {
+        DocumentsEntity updatedDocument = documentsService.actualizacionDocument(id, documentDto);
+        return ResponseHandler.generateResponse(
+                HttpStatus.OK,
+                updatedDocument,
+                true
+        );
+    }
 }
