@@ -12,7 +12,12 @@ public class CorsConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**");
+                // Ajusta el path y orígenes según tus necesidades
+                registry.addMapping("/api/v1/**") // Específica el path de tus endpoints
+                        .allowedOrigins("http://localhost:8080") // Cambia esto al origen que necesites
+                        .allowedMethods("GET", "POST", "PUT", "DELETE") // Métodos permitidos
+                        .allowedHeaders("*") // Permitir todos los encabezados
+                        .allowCredentials(true); // Si necesitas enviar cookies o headers de autenticación
             }
         };
     }

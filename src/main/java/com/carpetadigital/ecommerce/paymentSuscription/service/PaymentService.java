@@ -13,6 +13,9 @@ import org.springframework.stereotype.Service;
 
 import com.carpetadigital.ecommerce.entity.DocumentsEntity;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
@@ -31,7 +34,8 @@ public class PaymentService {
     @Autowired
     private SubscriptionRepository subscriptionRepository;
 
-
+    @Autowired
+    private EmailService emailService;
 
     @Autowired
     private final com.carpetadigital.ecommerce.Repository.DocumentsRepository documentsRepository;
@@ -40,7 +44,7 @@ public class PaymentService {
         log.info("Procesando pago: " + paymentSuscriptionDto);
 
         if(paymentSuscriptionDto.getStatus() == null){
-            throw new Exception("El pago no se realizo correcrtamente");
+            throw new Exception("El pago no se realizó correctamente");
         }
 
         Payment payment = new Payment();
@@ -74,20 +78,43 @@ public class PaymentService {
             List<DocumentsEntity> documents = documentsRepository.findAllById(paymentSuscriptionDto.getDocumentIds());
             payment.setDocuments(documents);
 
-
             if (paymentSuscriptionDto.getUserId() != null) {
-
-                log.info("compra de producto " + payment);
+                log.info("Compra de producto " + payment);
             } else {
                 payment.setUserId(null);  // Si el campo permite nulos, deja el ID del usuario como nulo
 
+                // Extraer el correo del invitado desde el DTO
+                String invitadoEmail = paymentSuscriptionDto.getGuestEmail();  // Asegúrate de que guestEmail esté en el DTO
+
+                // Generar la boleta de compra como archivo
+                File archivoBoleta = generarBoletaDePago(payment);
+
+                // Enviar el correo con el producto y la boleta
+                emailService.sendProductEmail(
+                        invitadoEmail,
+                        "Tu producto y boleta",
+                        "Gracias por tu compra. Adjuntamos tu producto y boleta de compra.",
+                        archivoBoleta
+                );
+
                 log.info("Pago por producto para invitado: " + payment);
             }
-
-
         }
 
         paymentRepository.save(payment);
         return true;
+    }
+
+    // Método para generar la boleta de pago como un archivo de texto (puedes cambiar a PDF si es necesario)
+    public File generarBoletaDePago(Payment payment) throws IOException {
+        File archivo = new File("boleta_" + payment.getUserId() + ".txt");
+        FileWriter writer = new FileWriter(archivo);
+        writer.write("Boleta de compra\n");
+        writer.write("ID Pago: " + payment.getUserId() + "\n");
+        writer.write("Fecha: " + payment.getPaymentDate() + "\n");
+        writer.write("Total: " + payment.getAmount() + "\n");
+        writer.write("Estado del pago: " + payment.getPaymentStatus() + "\n");
+        writer.close();
+        return archivo;
     }
 }
