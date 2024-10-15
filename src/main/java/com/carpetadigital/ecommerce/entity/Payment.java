@@ -16,7 +16,7 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long paymentId;
 
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private Long userId;
 
     @ManyToOne

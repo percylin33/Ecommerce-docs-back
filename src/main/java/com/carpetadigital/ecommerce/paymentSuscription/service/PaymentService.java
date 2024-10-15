@@ -84,20 +84,21 @@ public class PaymentService {
                 payment.setUserId(null);  // Si el campo permite nulos, deja el ID del usuario como nulo
 
                 // Extraer el correo del invitado desde el DTO
-                String invitadoEmail = paymentSuscriptionDto.getGuestEmail();  // Asegúrate de que guestEmail esté en el DTO
+                String invitadoEmail = paymentSuscriptionDto.getGuestEmail();
 
+                // Verificar que el correo del invitado no sea nulo
+                if (invitadoEmail == null || invitadoEmail.isEmpty()) {
+                    throw new IllegalArgumentException("To address must not be null");
+                }
+
+payment.setUserId(Long.valueOf(1));
                 // Generar la boleta de compra como archivo
                 File archivoBoleta = generarBoletaDePago(payment);
 
                 // Enviar el correo con el producto y la boleta
-                emailService.sendProductEmail(
-                        invitadoEmail,
-                        "Tu producto y boleta",
-                        "Gracias por tu compra. Adjuntamos tu producto y boleta de compra.",
-                        archivoBoleta
-                );
-
-                log.info("Pago por producto para invitado: " + payment);
+                String subject = paymentSuscriptionDto.getSubject();
+                String body = paymentSuscriptionDto.getBody();
+                emailService.sendProductEmail(invitadoEmail, subject, body, archivoBoleta);
             }
         }
 
