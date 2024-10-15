@@ -31,8 +31,6 @@ public class PaymentService {
     @Autowired
     private SubscriptionRepository subscriptionRepository;
 
-
-
     @Autowired
     private final com.carpetadigital.ecommerce.Repository.DocumentsRepository documentsRepository;
 
@@ -72,6 +70,13 @@ public class PaymentService {
         } else {
             // Lógica de orden de compra
             List<DocumentsEntity> documents = documentsRepository.findAllById(paymentSuscriptionDto.getDocumentIds());
+            // Verificar si los documentos ya están asociados con el pago
+            for (DocumentsEntity document : documents) {
+                if (document.getPayments().contains(payment)) {
+                    throw new Exception("El documento ya está asociado con el pago");
+                }
+            }
+
             payment.setDocuments(documents);
 
 
