@@ -15,18 +15,15 @@ public class EmailService {
     @Autowired
     private JavaMailSender mailSender;
 
-    public void sendProductEmail(String toEmail, String subject, String body, File attachment) throws MessagingException {
+    public void sendProductEmail(String toEmail, String subject, String body) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
         helper.setTo(toEmail);
         helper.setSubject(subject);
-        helper.setText(body);
+        helper.setText(body, true);
 
         // Adjuntar archivo (boleta)
-        if (attachment != null) {
-            helper.addAttachment(attachment.getName(), attachment);
-        }
 
         mailSender.send(message);
     }

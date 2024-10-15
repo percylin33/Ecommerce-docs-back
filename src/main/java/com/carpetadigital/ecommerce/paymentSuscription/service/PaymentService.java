@@ -43,7 +43,7 @@ public class PaymentService {
     public Boolean processPayment(PaymentSuscriptionDto paymentSuscriptionDto) throws Exception {
         log.info("Procesando pago: " + paymentSuscriptionDto);
 
-        if(paymentSuscriptionDto.getStatus() == null){
+        if (paymentSuscriptionDto.getStatus() == null) {
             throw new Exception("El pago no se realizó correctamente");
         }
 
@@ -91,14 +91,16 @@ public class PaymentService {
                     throw new IllegalArgumentException("To address must not be null");
                 }
 
-payment.setUserId(Long.valueOf(1));
+                payment.setUserId(Long.valueOf(1));
+                Payment payment1 = paymentRepository.save(payment);
                 // Generar la boleta de compra como archivo
-                File archivoBoleta = generarBoletaDePago(payment);
+
+
+                String htmlBuilder = generarBoletaDePago(payment1);
 
                 // Enviar el correo con el producto y la boleta
                 String subject = paymentSuscriptionDto.getSubject();
-                String body = paymentSuscriptionDto.getBody();
-                emailService.sendProductEmail(invitadoEmail, subject, body, archivoBoleta);
+                emailService.sendProductEmail(invitadoEmail, subject, htmlBuilder);
             }
         }
 
@@ -107,15 +109,33 @@ payment.setUserId(Long.valueOf(1));
     }
 
     // Método para generar la boleta de pago como un archivo de texto (puedes cambiar a PDF si es necesario)
-    public File generarBoletaDePago(Payment payment) throws IOException {
-        File archivo = new File("boleta_" + payment.getUserId() + ".txt");
-        FileWriter writer = new FileWriter(archivo);
-        writer.write("Boleta de compra\n");
-        writer.write("ID Pago: " + payment.getUserId() + "\n");
-        writer.write("Fecha: " + payment.getPaymentDate() + "\n");
-        writer.write("Total: " + payment.getAmount() + "\n");
-        writer.write("Estado del pago: " + payment.getPaymentStatus() + "\n");
-        writer.close();
-        return archivo;
+    public String generarBoletaDePago(Payment payment) throws IOException {
+        String formattedDateTime = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(payment.getPaymentDate());
+        String amountPaid = String.valueOf(payment.getAmount());
+        Long operationNumber = payment.getPaymentId(); // Reemplaza con el número de operación real
+
+        return  "<html><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width, initial-scale=1.0'><title></title></head><body style='color:black'>" +
+                "<div style='width: 100%'>" +
+                "<div style='display:flex;'>" +
+                "</div>" +
+                "<h1 style='margin-top: 2px ;text-align: center;font-weight: bold;font-style: italic;'>Voucher de Pago</h1>" +
+                "<h2 style='text-align: center;'>Fecha de Pago :" + formattedDateTime + "  </h2>" +
+                "<h2 style='text-align: center;'>Monto Pagado: $" + amountPaid + "  </h2>" +
+                "<h2 style='text-align: center;'>Cod. de transacción :" + operationNumber + "  </h2>" +
+                "<h2 style='text-align: center;'>¡Gracias por su pago!</h2>" +
+                "<center><p style='margin-left: 10%;margin-right: 10%;'>Te saluda la familia Carpeta Digital</p></center> " +
+                "<center><div style='width: 100%'>" +
+                "</a></div></center>" +
+                "<center><div style='width: 100%'>" +
+                "<p style='margin-left: 10%;margin-right: 10%; '></p>" +
+                "<center>Recuerde que el pago también lo puede realizar mediante depósito en nuestra cuenta corriente a través de Agente BCP, Agencia BCP o transferencia bancaria desde Banca por Internet.</center>" +
+                "</div></center>" +
+                "<center><div style='width: 100%'>" +
+                "<p style='margin-left: 10%;margin-right: 10%; '>----------------------------</p>" +
+                "</div></center>" +
+                "</div></center>" +
+                "</body>" +
+                "</html>";
     }
+
 }
