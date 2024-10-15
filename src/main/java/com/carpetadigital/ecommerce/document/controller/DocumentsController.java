@@ -1,6 +1,5 @@
 package com.carpetadigital.ecommerce.document.controller;
 
-import com.carpetadigital.ecommerce.entity.DocumentsEntity;
 import com.carpetadigital.ecommerce.entity.dto.DocumentDto;
 import com.carpetadigital.ecommerce.Repository.DocumentsRepository;
 import com.carpetadigital.ecommerce.utils.handler.ResponseHandler;
@@ -10,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/document")
@@ -39,10 +37,9 @@ public class DocumentsController {
     // buscar todos los documentos
     @GetMapping()
     public ResponseEntity<Object> getAllDocuments() {
-        List<DocumentsEntity> allDocuments = documentsService.getAllDocuments();
         return ResponseHandler.generateResponse(
                 HttpStatus.OK,
-                allDocuments,
+                documentsService.getAllDocuments(),
                 true
         );
     }
@@ -50,10 +47,9 @@ public class DocumentsController {
     // buscar un elemento por key: value (búsqueda dinámica)
     @GetMapping("/searchBy")
     public ResponseEntity<Object> searchDocumentBy(@RequestParam String key, @RequestParam String value) {
-        List<DocumentsEntity> documentoEncontrado = documentsService.getBy(key, value);
         return ResponseHandler.generateResponse(
                 HttpStatus.OK,
-                documentoEncontrado,
+                documentsService.getBy(key, value),
                 true
         );
     }
@@ -72,10 +68,9 @@ public class DocumentsController {
     // actualización de un documento
     @PutMapping("/{id}")
     public ResponseEntity<Object> actualizacionDocument(@PathVariable Long id, @ModelAttribute DocumentDto documentDto) {
-        DocumentsEntity updatedDocument = documentsService.actualizacionDocument(id, documentDto);
         return ResponseHandler.generateResponse(
                 HttpStatus.OK,
-                updatedDocument,
+                documentsService.actualizacionDocument(id, documentDto),
                 true
         );
     }
