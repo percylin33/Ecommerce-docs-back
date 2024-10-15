@@ -100,8 +100,9 @@ public class PaymentService {
         log.info("Subscription successful: {}", subscription);
     }
 
-    private void processOrderPayment(PaymentSuscriptionDto paymentSuscriptionDto, Payment payment) throws IOException, MessagingException {
+    private void processOrderPayment(PaymentSuscriptionDto paymentSuscriptionDto, Payment payment) throws Exception {
         List<DocumentsEntity> documents = documentsRepository.findAllById(paymentSuscriptionDto.getDocumentIds());
+        verifyDocumentsAssociation(documents, payment);
         payment.setDocuments(documents);
 
         Payment savedPayment = paymentRepository.save(payment);
@@ -109,6 +110,14 @@ public class PaymentService {
         String htmlContent = generatePaymentReceipt(savedPayment);
         String subject = paymentSuscriptionDto.getSubject();
         emailService.sendProductEmail(paymentSuscriptionDto.getGuestEmail(), subject, htmlContent);
+    }
+
+    private void verifyDocumentsAssociation(List<DocumentsEntity> documents, Payment payment) throws Exception {
+        for (DocumentsEntity document : documents) {
+            if (document.getPayments().contains(payment)) {
+                throw new Exception("El documento ya está asociado con el pago");
+            }
+        }
     }
 
     public String generatePaymentReceipt(Payment payment) {

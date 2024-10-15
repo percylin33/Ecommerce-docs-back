@@ -100,16 +100,24 @@ public class GoogleDriveService {
 
         Drive service = getInstance();
 
-        // Print the names and IDs for up to 10 files.
+        // Print the names, IDs, and URLs for up to 10 files.
         FileList result = service.files().list()
                 .setPageSize(10)
+                .setFields("files(id, name, webViewLink)")
                 .execute();
         List<File> files = result.getFiles();
         if (files == null || files.isEmpty()) {
             System.out.println("No files found.");
             return "No files found.";
         } else {
-            return files.toString();
+            StringBuilder fileDetails = new StringBuilder();
+            for (File file : files) {
+                fileDetails.append("Name: ").append(file.getName())
+                        .append(", ID: ").append(file.getId())
+                        .append(", URL: ").append(file.getWebViewLink())
+                        .append("\n");
+            }
+            return fileDetails.toString();
         }
     }
 

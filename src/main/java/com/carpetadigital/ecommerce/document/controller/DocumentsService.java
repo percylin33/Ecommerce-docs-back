@@ -8,6 +8,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,7 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
+@Slf4j
 @Service
 @RestController
 public class DocumentsService {
@@ -75,8 +76,10 @@ public class DocumentsService {
                 datosIngreso.setFileUrl(fileUrl);
                 datosIngreso.setFileId(fileId);
 
-                documentsRepository.save(datosIngreso);
-                return datosIngreso;
+                DocumentsEntity documentsEntity= documentsRepository.save(datosIngreso);
+                log.info(" datosIngreso" + datosIngreso);
+                log.info("Documento guardado correctamente" + documentsEntity);
+                return documentsEntity;
 
             } else {
                 throw new IllegalArgumentException("el tipo de archivo no es permitido");
