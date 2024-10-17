@@ -17,7 +17,7 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long paymentId;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Long userId;
 
     @ManyToOne
@@ -44,6 +44,10 @@ public class Payment {
     )
     @JsonManagedReference
     private List<DocumentsEntity> documents;
+
+    @ManyToOne
+    @JoinColumn(name = "state_id")
+    private State state;
 
     public boolean isSubscription() {
         return isSubscription;

@@ -26,14 +26,13 @@ public class Subscription {
     @Column(nullable = false)
     private java.sql.Date endDate;
 
-    @Column
-    private String status;
-
     @Column(name = "subscription_type")
     private String subscriptionType;
 
     @OneToMany(mappedBy = "subscription")
     private List<Payment> payments;
 
-
+    @ManyToOne
+    @JoinColumn(name = "state_id")
+    private State state;
 }
