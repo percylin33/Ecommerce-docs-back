@@ -14,7 +14,7 @@ public class CorsConfig {
             public void addCorsMappings(CorsRegistry registry) {
                 // Ajusta el path y orígenes según tus necesidades
                 registry.addMapping("/api/v1/**") // Específica el path de tus endpoints
-                        .allowedOrigins("http://localhost:8080") // Cambia esto al origen que necesites
+                        .allowedOrigins("http://localhost:4200") // Cambia esto al origen que necesites
                         .allowedMethods("GET", "POST", "PUT", "DELETE") // Métodos permitidos
                         .allowedHeaders("*") // Permitir todos los encabezados
                         .allowCredentials(true); // Si necesitas enviar cookies o headers de autenticación

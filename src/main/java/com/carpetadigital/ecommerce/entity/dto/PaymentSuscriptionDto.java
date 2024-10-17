@@ -34,6 +34,7 @@ public class PaymentSuscriptionDto {
 
     private List<Long> documentIds; // IDs de los documentos comprados
     private String guestEmail;
+    private String template;
 
     // Nuevos campos para manejar el envío de correos electrónicos
     private String subject;          // Asunto del correo

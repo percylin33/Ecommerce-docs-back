@@ -21,6 +21,7 @@ public class AuthService {
     private final RoleService rolService;
     private final AuthenticationManager authenticationManager;
     public AuthResponse login(LoginRequest request) {
+        log.info("Autenticando usuario: {}", request);
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
         UserDetails user = userRepository.findByUsername(request.getUsername()).orElseThrow();
         String token = jwtService.getToken(user);

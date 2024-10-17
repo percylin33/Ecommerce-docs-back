@@ -45,6 +45,10 @@ public class Payment {
     @JsonManagedReference
     private List<DocumentsEntity> documents;
 
+    @ManyToOne
+    @JoinColumn(name = "state_id")
+    private State state;
+
     public boolean isSubscription() {
         return isSubscription;
     }

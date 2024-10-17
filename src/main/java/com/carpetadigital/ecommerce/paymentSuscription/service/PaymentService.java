@@ -1,47 +1,52 @@
 package com.carpetadigital.ecommerce.paymentSuscription.service;
 
+import com.carpetadigital.ecommerce.Repository.StateRepository;
+import com.carpetadigital.ecommerce.entity.DocumentsEntity;
 import com.carpetadigital.ecommerce.entity.Payment;
+import com.carpetadigital.ecommerce.entity.State;
 import com.carpetadigital.ecommerce.entity.Subscription;
 import com.carpetadigital.ecommerce.entity.dto.PaymentSuscriptionDto;
 import com.carpetadigital.ecommerce.repository.PaymentRepository;
 import com.carpetadigital.ecommerce.repository.SubscriptionRepository;
 import jakarta.mail.MessagingException;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.carpetadigital.ecommerce.entity.DocumentsEntity;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
 public class PaymentService {
 
+    private static final Long DEFAULT_STATE_ID = 2L;
+
     private final PaymentRepository paymentRepository;
     private final JavaMailSender mailSender;
     private final SubscriptionRepository subscriptionRepository;
     private final EmailService emailService;
+    private final StateRepository stateRepository;
     private final com.carpetadigital.ecommerce.Repository.DocumentsRepository documentsRepository;
 
     @Autowired
     public PaymentService(PaymentRepository paymentRepository, JavaMailSender mailSender,
-                          SubscriptionRepository subscriptionRepository, EmailService emailService,
+                          SubscriptionRepository subscriptionRepository, EmailService emailService, StateRepository stateRepository,
                           com.carpetadigital.ecommerce.Repository.DocumentsRepository documentsRepository) {
         this.paymentRepository = paymentRepository;
         this.mailSender = mailSender;
         this.subscriptionRepository = subscriptionRepository;
         this.emailService = emailService;
+        this.stateRepository = stateRepository;
         this.documentsRepository = documentsRepository;
     }
 
+    @Transactional
     public Boolean processPayment(PaymentSuscriptionDto paymentSuscriptionDto) throws Exception {
         log.info("Processing payment: {}", paymentSuscriptionDto);
 
@@ -64,26 +69,37 @@ public class PaymentService {
             throw new Exception("Payment was not successful");
         }
 
-        String guestEmail = paymentSuscriptionDto.getGuestEmail();
-        if (guestEmail == null || guestEmail.isEmpty()) {
-            throw new IllegalArgumentException("To address must not be null");
-        }
+        Optional.ofNullable(paymentSuscriptionDto.getGuestEmail())
+                .filter(email -> !email.isEmpty())
+                .orElseThrow(() -> new IllegalArgumentException("To address must not be null"));
     }
 
     private Payment createPayment(PaymentSuscriptionDto paymentSuscriptionDto) {
         Payment payment = new Payment();
-        payment.setPaymentDate(new java.sql.Timestamp(System.currentTimeMillis()));
-        payment.setUserId(paymentSuscriptionDto.getUserId() != null ? paymentSuscriptionDto.getUserId() : null);
+        payment.setPaymentDate(new Timestamp(System.currentTimeMillis()));
+        payment.setUserId(paymentSuscriptionDto.getUserId());
         payment.setAmount(paymentSuscriptionDto.getAmount());
         payment.setPaymentStatus(paymentSuscriptionDto.getStatus());
         payment.setIsSubscription(paymentSuscriptionDto.isSubscription());
+
+        State defaultState = getDefaultState();
+        payment.setState(defaultState);
+
         return payment;
     }
 
-    private void processSubscriptionPayment(PaymentSuscriptionDto paymentSuscriptionDto, Payment payment) {
+    private void processSubscriptionPayment(PaymentSuscriptionDto paymentSuscriptionDto, Payment payment) throws MessagingException {
+        Subscription subscription = createSubscription(paymentSuscriptionDto);
+        Subscription savedSubscription = subscriptionRepository.save(subscription);
+        payment.setSubscription(savedSubscription);
+        emailService.sendProductEmail(paymentSuscriptionDto.getGuestEmail(), paymentSuscriptionDto.getSubject(), "Subscription successful");
+
+        log.info("Subscription successful: {}", subscription);
+    }
+
+    private Subscription createSubscription(PaymentSuscriptionDto paymentSuscriptionDto) {
         Subscription subscription = new Subscription();
         subscription.setUserId(paymentSuscriptionDto.getUserId());
-        subscription.setStatus(paymentSuscriptionDto.getStatus());
         subscription.setSubscriptionType(paymentSuscriptionDto.getSubscriptionType());
 
         Date sqlStartDate = new Date(System.currentTimeMillis());
@@ -94,10 +110,11 @@ public class PaymentService {
         Date sqlEndDate = Date.valueOf(endLocalDate);
 
         subscription.setEndDate(sqlEndDate);
-        Subscription savedSubscription = subscriptionRepository.save(subscription);
-        payment.setSubscription(savedSubscription);
 
-        log.info("Subscription successful: {}", subscription);
+        State defaultState = getDefaultState();
+        subscription.setState(defaultState);
+
+        return subscription;
     }
 
     private void processOrderPayment(PaymentSuscriptionDto paymentSuscriptionDto, Payment payment) throws Exception {
@@ -108,8 +125,7 @@ public class PaymentService {
         Payment savedPayment = paymentRepository.save(payment);
 
         String htmlContent = generatePaymentReceipt(savedPayment);
-        String subject = paymentSuscriptionDto.getSubject();
-        emailService.sendProductEmail(paymentSuscriptionDto.getGuestEmail(), subject, htmlContent);
+        emailService.sendProductEmail(paymentSuscriptionDto.getGuestEmail(), paymentSuscriptionDto.getSubject(), htmlContent);
     }
 
     private void verifyDocumentsAssociation(List<DocumentsEntity> documents, Payment payment) throws Exception {
@@ -118,6 +134,11 @@ public class PaymentService {
                 throw new Exception("El documento ya está asociado con el pago");
             }
         }
+    }
+
+    private State getDefaultState() {
+        return stateRepository.findById(DEFAULT_STATE_ID)
+                .orElseThrow(() -> new IllegalStateException("Default state not found"));
     }
 
     public String generatePaymentReceipt(Payment payment) {

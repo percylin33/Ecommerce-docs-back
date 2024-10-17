@@ -1,11 +1,18 @@
-package com.carpetadigital.ecommerce.paymentSuscription.controller;
+package com.carpetadigital.ecommerce.entity.dto;
 
 
 
 
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class PaymentRequest {
 
     private Long userId;
@@ -17,6 +24,7 @@ public class PaymentRequest {
     private String guestEmail;
     private String subject;
     private String body;
+    private Integer template;
     private List<String> attachments;  // Archivos adjuntos
     private List<String> cc;           // Correos en copia
     private List<String> bcc;          // Correos en copia oculta
