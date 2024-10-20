@@ -56,8 +56,8 @@ public class EmailService {
             helper.setTo(toEmail);
             helper.setSubject(subject);
             helper.setText(body, true);
-
-            // Enviar el correo
+            log.info("aqui");
+            log.info("Preparando para enviar el correo...");
             mailSender.send(message);
             log.info("Envío exitoso a: " + toEmail);
         } catch (MessagingException e) {
