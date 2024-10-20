@@ -1,4 +1,4 @@
-package com.carpetadigital.ecommerce.paymentSuscription.controller;
+package com.carpetadigital.ecommerce.entity.dto;
 
 
 
@@ -6,7 +6,7 @@ package com.carpetadigital.ecommerce.paymentSuscription.controller;
 
 import java.util.List;
 
-public class PaymentRequest {
+public class PaymentRequestDto {
 
     private Long userId;
     private Double amount;
@@ -14,6 +14,7 @@ public class PaymentRequest {
     private String status;
     private String subscriptionType;
     private List<Long> documentIds;  // IDs de los documentos comprados
+    private Integer template;
     private String guestEmail;
     private String subject;
     private String body;
@@ -117,5 +118,13 @@ public class PaymentRequest {
 
     public void setBcc(List<String> bcc) {
         this.bcc = bcc;
+    }
+
+    public Integer getTemplate() {
+        return template;
+    }
+
+    public void setTemplate(Integer template) {
+        this.template = template;
     }
 }

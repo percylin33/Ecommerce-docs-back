@@ -1,12 +1,11 @@
 package com.carpetadigital.ecommerce.paymentSuscription.service;
 
+import com.carpetadigital.ecommerce.email.service.EmailService;
 import com.carpetadigital.ecommerce.entity.Payment;
 import com.carpetadigital.ecommerce.entity.Subscription;
 import com.carpetadigital.ecommerce.entity.dto.PaymentSuscriptionDto;
 import com.carpetadigital.ecommerce.repository.PaymentRepository;
 import com.carpetadigital.ecommerce.repository.SubscriptionRepository;
-import jakarta.mail.MessagingException;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -14,9 +13,6 @@ import org.springframework.stereotype.Service;
 
 import com.carpetadigital.ecommerce.entity.DocumentsEntity;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
