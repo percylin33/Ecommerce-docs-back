@@ -35,6 +35,7 @@ public class User implements UserDetails {
     String firstname;
     String lastname;
     String country;
+    String image;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "rol_id")

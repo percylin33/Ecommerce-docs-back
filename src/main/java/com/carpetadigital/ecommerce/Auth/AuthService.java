@@ -23,8 +23,8 @@ public class AuthService {
     public AuthResponse login(LoginRequest request) {
         log.info("Autenticando usuario: {}", request);
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
-        UserDetails user = userRepository.findByUsername(request.getUsername()).orElseThrow();
-        String token = jwtService.getToken(user);
+        User user = userRepository.findByUsername(request.getUsername()).orElseThrow();
+        String token = jwtService.getToken(user, user.getFirstname(), user.getLastname(), user.getImage());
         return AuthResponse.builder()
                 .token(token)
                 .build();
@@ -61,11 +61,12 @@ public class AuthService {
 
         // Devolver la respuesta de autenticación
         return AuthResponse.builder()
-                .token(jwtService.getToken(savedUser))
+                .token(jwtService.getToken(savedUser, savedUser.getFirstname(), savedUser.getLastname(), savedUser.getImage()))
                 .build();
     }
 
     public void logout(String token) {
+        log.info("Invalidando token: {}"+ token);
         // Aquí puedes invalidar el token JWT, por ejemplo, añadiéndolo a una lista de tokens inválidos
         jwtService.invalidateToken(token);
     }
