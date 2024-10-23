@@ -9,6 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+
 
 @RestController
 @RequestMapping("/api/v1/document")
@@ -25,7 +28,7 @@ public class DocumentsController {
 
     // guardado de un documento
     @PostMapping()
-    public Object postDocument(@ModelAttribute @Validated DocumentDto documentDto) {
+    public Object postDocument(@ModelAttribute @Validated DocumentDto documentDto) throws GeneralSecurityException, IOException {
         Object documentoGuardado = documentsService.postDocument(documentDto);
         return ResponseHandler.generateResponse(
                 HttpStatus.CREATED,
@@ -54,10 +57,31 @@ public class DocumentsController {
         );
     }
 
+    // buscar archivo de un documento específico por Id
+    @GetMapping("/file/{id}")
+    public ResponseEntity<Object> searchFile(@PathVariable Long id) throws GeneralSecurityException, IOException {
+        return ResponseHandler.generateResponse(
+                HttpStatus.OK,
+                documentsService.searchFile(id),
+                true
+        );
+    }
+
     // borrado lógico del documento
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> borradoLogicoDocument(@PathVariable Long id) {
         documentsService.borradoLogicoDocument(id);
+        return ResponseHandler.generateResponse(
+                HttpStatus.OK,
+                null,
+                true
+        );
+    }
+
+    // elimina documento físicamente (base de datos y google drive)
+    @DeleteMapping("/fisico/{id}")
+    public ResponseEntity<Object> borradoFisicoDocument(@PathVariable Long id) {
+        documentsService.borradoFisicoDocument(id);
         return ResponseHandler.generateResponse(
                 HttpStatus.OK,
                 null,

@@ -1,5 +1,10 @@
 HELP.md
 target/
+
+# Ignorar el archivo credentials.json
+/src/main/resources/credentials.json
+credencial.json
+
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/

@@ -38,6 +38,12 @@ public class DocumentsEntity {
     @Column(name = "file_id", nullable = false, length = 100)
     private String fileId;
 
+    @Column(name = "web_view_link", nullable = false, length = 150)
+    private String webViewLink;
+
+    @Column(name = "web_content_link", nullable = false, length = 150)
+    private String webContentLink;
+
     @Column(length = 50)
     private String category;
 

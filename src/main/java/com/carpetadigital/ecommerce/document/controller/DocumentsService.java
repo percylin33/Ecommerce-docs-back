@@ -1,5 +1,7 @@
 package com.carpetadigital.ecommerce.document.controller;
 
+import com.carpetadigital.ecommerce.GoogleDrive.DriveService;
+import com.carpetadigital.ecommerce.GoogleDrive.Res;
 import com.carpetadigital.ecommerce.entity.DocumentsEntity;
 import com.carpetadigital.ecommerce.entity.dto.DocumentDto;
 import com.carpetadigital.ecommerce.Repository.DocumentsRepository;
@@ -19,6 +21,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +35,9 @@ public class DocumentsService {
     @Autowired
     private EntityManager entityManager;
 
+    @Autowired
+    private DriveService driveService;
+
     private final DocumentsRepository documentsRepository;
 
     public DocumentsService(DocumentsRepository documentsRepository) {
@@ -38,7 +45,9 @@ public class DocumentsService {
     }
 
     // servicio para guardar un documento en base de datos
-    public Object postDocument(DocumentDto documento) {
+    public Object postDocument(DocumentDto documento) throws GeneralSecurityException, IOException {
+
+
         MultipartFile file = documento.getFile();
         // compruebo si el archivo viene vacío o no viene
         if (file == null || file.isEmpty()) {
@@ -66,8 +75,16 @@ public class DocumentsService {
                     fileType.equals("image/png") ||
                     fileType.equals("image/gif")
             ) {
-                String fileUrl = "http://prueba";
-                String fileId = "kajdsha2dasf2a2d2fa2df2a";
+
+//                ResDrive resDrive = guardarArchivoEnDrive(file);
+
+                Res responseDrive = driveService.uploadFileToDrive(file);
+
+                String fileUrl = responseDrive.getUrl();
+                String fileId = responseDrive.getIdFile();
+                String webViewLink = responseDrive.getWebViewLink();
+                String webContentLink = responseDrive.getWebContentLink();
+
                 String title = documento.getTitle();
                 String description = documento.getDescription();
                 String format = documento.getFormat();
@@ -79,8 +96,11 @@ public class DocumentsService {
                 datosIngreso.setFormat(format);
                 datosIngreso.setPrice(price);
                 datosIngreso.setCategory(category);
+
                 datosIngreso.setFileUrl(fileUrl);
                 datosIngreso.setFileId(fileId);
+                datosIngreso.setWebViewLink(webViewLink);
+                datosIngreso.setWebContentLink(webContentLink);
 
                 DocumentsEntity documentsEntity = documentsRepository.save(datosIngreso);
                 log.info(" datosIngreso" + datosIngreso);
@@ -93,6 +113,10 @@ public class DocumentsService {
         } else {
             throw new IllegalArgumentException("documento existente");
         }
+    }
+
+    private Res guardarArchivoEnDrive(MultipartFile file) throws GeneralSecurityException, IOException {
+        return driveService.uploadFileToDrive(file);
     }
 
     // servicio para buscar uno o todos los elementos que coinciden con los valores que vienen en key: value
@@ -126,6 +150,16 @@ public class DocumentsService {
         }
     }
 
+    // servicio para buscar el documento, recuperar el idFile, buscar el file en google drive y devolverlo al frontend
+    public Res searchFile(Long id) throws GeneralSecurityException, IOException {
+        Optional<DocumentsEntity> documentoEncontrado = documentsRepository.findById(id);
+        if (documentoEncontrado.isPresent()) {
+            return driveService.buscarFileDrive(documentoEncontrado.get().getFileId());
+        } else {
+            throw new IllegalArgumentException("error de consistencia de datos");
+        }
+    }
+
     //servicio para borrar un documento en forma lógica
     public void borradoLogicoDocument(Long id) {
         Optional<DocumentsEntity> documentoEncontrado = documentsRepository.findById(id);
@@ -138,6 +172,24 @@ public class DocumentsService {
         }
     }
 
+    // servicio para borrar un documento en forma permanente (fisica)
+    public void borradoFisicoDocument(Long id) {
+        Optional<DocumentsEntity> documentoEncontrado = documentsRepository.findById(id);
+        try {
+            if (documentoEncontrado.isPresent()) {
+                documentsRepository.deleteById(id);
+                driveService.deleteFileDeDrive(documentoEncontrado.get().getFileId());
+
+            } else {
+                throw new IllegalArgumentException("error de consistencia de datos");
+            }
+        } catch (Exception e) {
+            throw new IllegalArgumentException("error de borrado");
+        }
+
+    }
+
+    // servicio para actualizar un documento
     public DocumentsEntity actualizacionDocument(Long id, DocumentDto documentDto) {
         Optional<DocumentsEntity> datos = documentsRepository.findById(id);
 
@@ -162,11 +214,11 @@ public class DocumentsService {
 
                 // si el archivo es diferente borro el archivo existente y guardo el nuevo
                 // genero el fileUrl y fileId y lo guardo
-                String fileUrlUpdate = "http://Mofificado";
-                String fileIdUpdate = "modificado123456";
-
-                document.setFileUrl(fileUrlUpdate);
-                document.setFileId(fileIdUpdate);
+//                String fileUrlUpdate = "http://Mofificado";
+//                String fileIdUpdate = "modificado123456";
+//
+//                document.setFileUrl(fileUrlUpdate);
+//                document.setFileId(fileIdUpdate);
             } else {
                 throw new IllegalArgumentException("los elementos están actualizados");
             }
