@@ -10,6 +10,7 @@ public class Res {
     private String url;
     private String webViewLink;
     private String webContentLink;
+    private String hashFile;
 
     private String fileName;
     private String mimeType;

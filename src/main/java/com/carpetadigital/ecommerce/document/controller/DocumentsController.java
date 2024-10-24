@@ -91,7 +91,7 @@ public class DocumentsController {
 
     // actualización de un documento
     @PutMapping("/{id}")
-    public ResponseEntity<Object> actualizacionDocument(@PathVariable Long id, @ModelAttribute DocumentDto documentDto) {
+    public ResponseEntity<Object> actualizacionDocument(@PathVariable Long id, @ModelAttribute DocumentDto documentDto) throws Exception {
         return ResponseHandler.generateResponse(
                 HttpStatus.OK,
                 documentsService.actualizacionDocument(id, documentDto),

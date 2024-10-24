@@ -184,7 +184,7 @@ public class DriveService {
     }
 
     // servicio para buscar un file de google drive
-    public Res buscarFileDrive(String fileId) throws GeneralSecurityException, IOException {
+    public File buscarFileDrive(String fileId) throws GeneralSecurityException, IOException {
         Res res = new Res();
 
         try {
@@ -192,9 +192,9 @@ public class DriveService {
 
             // obtener el archivo desde Google Drive
             File file = drive.files().get(fileId)
-                    .setFields("id, name, mimeType")
+                    .setFields("id, name, mimeType, md5Checksum")
                     .execute();
-
+/*
             // Obtener el contenido del archivo como InputStream
             InputStream inputStream = drive.files().get(fileId).executeMediaAsInputStream();
 
@@ -204,18 +204,27 @@ public class DriveService {
             // Cofificar el archivo en base64
             String fileBase64 = Base64.getEncoder().encodeToString(fileBytes);
 
+            System.out.println(file.getMd5Checksum() + "-------------------");
+
             res.setStatus(200);
             res.setMessage("búsqueda exitosa");
-            res.setIdFile(fileBase64);
+//            res.setIdFile(fileBase64);
             res.setFileName(file.getName());
             res.setMimeType(file.getMimeType());
+            res.setHashFile(file.getMd5Checksum());
+            res.setIdFile(file.getId());
             return res;
+
+ */
+            return file;
         } catch (Exception e) {
             res.setStatus(500);
             res.setMessage("Error al borrar el archivo de Google Drive");
             throw e;
         }
     }
+
+
 
     private Drive createDriveService() throws GeneralSecurityException, IOException {
 

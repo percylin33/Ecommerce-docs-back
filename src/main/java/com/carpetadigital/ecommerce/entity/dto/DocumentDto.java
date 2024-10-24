@@ -21,7 +21,7 @@ public class DocumentDto {
 
     @NotBlank(message = "No puede estar vacío")
     @NotNull(message = "El campo no puede estar vacío")
-    @Size(min=3, message = "El campo debe tener más de 5")
+    @Size(min=3, message = "El campo debe tener más de 3 caracteres")
     private String description;
 
     @NotBlank(message = "No puede estar vacío")

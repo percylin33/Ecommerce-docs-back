@@ -6,6 +6,7 @@ import com.carpetadigital.ecommerce.entity.DocumentsEntity;
 import com.carpetadigital.ecommerce.entity.dto.DocumentDto;
 import com.carpetadigital.ecommerce.Repository.DocumentsRepository;
 import com.carpetadigital.ecommerce.utils.handler.ResponseHandler;
+import com.google.api.services.drive.model.File;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -47,7 +48,6 @@ public class DocumentsService {
     // servicio para guardar un documento en base de datos
     public Object postDocument(DocumentDto documento) throws GeneralSecurityException, IOException {
 
-
         MultipartFile file = documento.getFile();
         // compruebo si el archivo viene vacío o no viene
         if (file == null || file.isEmpty()) {
@@ -59,7 +59,7 @@ public class DocumentsService {
         // compruebo que la extensión del archivo coincide con el valor de format
         String fileName = file.getOriginalFilename();
         String extension = fileName.substring(fileName.lastIndexOf(".") + 1);
-        System.out.println(extension);
+
         if (!extension.equalsIgnoreCase(documento.getFormat())) {
             throw new IllegalArgumentException("no corresponde el tipo de archivo con su formato");
         }
@@ -75,8 +75,6 @@ public class DocumentsService {
                     fileType.equals("image/png") ||
                     fileType.equals("image/gif")
             ) {
-
-//                ResDrive resDrive = guardarArchivoEnDrive(file);
 
                 Res responseDrive = driveService.uploadFileToDrive(file);
 
@@ -103,8 +101,8 @@ public class DocumentsService {
                 datosIngreso.setWebContentLink(webContentLink);
 
                 DocumentsEntity documentsEntity = documentsRepository.save(datosIngreso);
-                log.info(" datosIngreso" + datosIngreso);
-                log.info("Documento guardado correctamente" + documentsEntity);
+//                log.info(" datosIngreso" + datosIngreso);
+//                log.info("Documento guardado correctamente" + documentsEntity);
                 return documentsEntity;
 
             } else {
@@ -151,9 +149,10 @@ public class DocumentsService {
     }
 
     // servicio para buscar el documento, recuperar el idFile, buscar el file en google drive y devolverlo al frontend
-    public Res searchFile(Long id) throws GeneralSecurityException, IOException {
+    public File searchFile(Long id) throws GeneralSecurityException, IOException {
         Optional<DocumentsEntity> documentoEncontrado = documentsRepository.findById(id);
         if (documentoEncontrado.isPresent()) {
+            System.out.println("documento encontrado");
             return driveService.buscarFileDrive(documentoEncontrado.get().getFileId());
         } else {
             throw new IllegalArgumentException("error de consistencia de datos");
@@ -190,7 +189,7 @@ public class DocumentsService {
     }
 
     // servicio para actualizar un documento
-    public DocumentsEntity actualizacionDocument(Long id, DocumentDto documentDto) {
+    public DocumentsEntity actualizacionDocument(Long id, DocumentDto documentDto) throws Exception {
         Optional<DocumentsEntity> datos = documentsRepository.findById(id);
 
         if (datos.isPresent()) {
@@ -209,16 +208,43 @@ public class DocumentsService {
             } else if (documentDto.getCategory() != null && !documentDto.getCategory().equals(document.getCategory())) {
                 document.setCategory(documentDto.getCategory());
             } else if (fileUpdate != null) {
-                // busco el archivo en GoogleDrive y lo comparo
-                // código
 
-                // si el archivo es diferente borro el archivo existente y guardo el nuevo
-                // genero el fileUrl y fileId y lo guardo
-//                String fileUrlUpdate = "http://Mofificado";
-//                String fileIdUpdate = "modificado123456";
-//
-//                document.setFileUrl(fileUrlUpdate);
-//                document.setFileId(fileIdUpdate);
+                String fileTypeUpdate = fileUpdate.getContentType();
+                String fileNameUpdate = fileUpdate.getOriginalFilename();
+                String extension = fileNameUpdate.substring(fileNameUpdate.lastIndexOf(".") + 1);
+
+                if (fileTypeUpdate.equals("application/pdf") ||
+                        fileTypeUpdate.equals("application/msword") ||
+                        fileTypeUpdate.equals("application/vnd.openxmlformats-officedocument.wordprocessingml.document") ||
+                        fileTypeUpdate.equals("image/jpeg") ||
+                        fileTypeUpdate.equals("image/png") ||
+                        fileTypeUpdate.equals("image/gif")
+                ) {
+
+                    // busco el archivo en GoogleDrive y lo comparo
+                    File file = driveService.buscarFileDrive(document.getFileId());
+
+                    if (file.isEmpty()) {
+                        Res responseDriveFileUpdate = driveService.uploadFileToDrive(fileUpdate);
+
+                        document.setFormat(extension);
+                        document.setFileId(responseDriveFileUpdate.getIdFile());
+                        document.setFileUrl(responseDriveFileUpdate.getUrl());
+                        document.setWebViewLink(responseDriveFileUpdate.getWebViewLink());
+                        document.setWebContentLink(responseDriveFileUpdate.getWebContentLink());
+                    } else {
+                        driveService.deleteFileDeDrive(document.getFileId());
+                        Res responseDriveFileUpdate = driveService.uploadFileToDrive(fileUpdate);
+
+                        document.setFormat(extension);
+                        document.setFileId(responseDriveFileUpdate.getIdFile());
+                        document.setFileUrl(responseDriveFileUpdate.getUrl());
+                        document.setWebViewLink(responseDriveFileUpdate.getWebViewLink());
+                        document.setWebContentLink(responseDriveFileUpdate.getWebContentLink());
+                    }
+                } else {
+                    throw new IllegalArgumentException("el tipo de archivo no es permitido");
+                }
             } else {
                 throw new IllegalArgumentException("los elementos están actualizados");
             }
