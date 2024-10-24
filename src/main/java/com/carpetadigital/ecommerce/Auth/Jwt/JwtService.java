@@ -16,8 +16,13 @@ import java.util.function.Function;
 public class JwtService {
     private final Set<String> invalidTokens = new HashSet<>();
     private static final String SECRET_KEY="53F8FS5613SDF2G3S1846121SD543EG14H5121421242SDD941J82";
-    public String getToken(UserDetails user) {
-        return getToken(new HashMap<>(), user);
+
+    public String getToken(UserDetails user, String name, String lastname, String image) {
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("name", name);
+        extraClaims.put("lastname", lastname);
+        extraClaims.put("image", image);
+        return getToken(extraClaims, user);
     }
 
     private String getToken(Map<String, Object> extraClaims, UserDetails user) {
@@ -27,7 +32,7 @@ public class JwtService {
                 .setSubject(user.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24)) // 24 minutos de expiración
-                .signWith(getKey(), SignatureAlgorithm.HS256) // Cambiado a HS256
+                .signWith(getKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
@@ -37,7 +42,7 @@ public class JwtService {
     }
 
     public String getUsernameFromToken(String token) {
-        return getClaim(token,Claims::getSubject);
+        return getClaim(token, Claims::getSubject);
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
@@ -71,4 +76,13 @@ public class JwtService {
         invalidTokens.add(token);
     }
 
+    public Map<String, Object> getUserInfoFromToken(String token) {
+        Claims claims = getAllClaims(token);
+        Map<String, Object> userInfo = new HashMap<>();
+        userInfo.put("username", claims.getSubject());
+        userInfo.put("name", claims.get("name"));
+        userInfo.put("lastname", claims.get("lastname"));
+        userInfo.put("image", claims.get("image"));
+        return userInfo;
+    }
 }
